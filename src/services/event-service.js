@@ -6,4 +6,10 @@ const getAll = async () => {
     return returnArray;
 };
 
-export { getAll };
+const getOne = async (values) => {    
+    const repo = new EventRepo();
+    const eventReturn = await repo.getOne(values);
+    return eventReturn;
+};
+
+export { getAll, getOne};

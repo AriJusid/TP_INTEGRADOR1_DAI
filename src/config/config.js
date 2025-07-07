@@ -10,6 +10,4 @@ const config = {
     port: Number(process.env.DB_PORT) // Make sure it's a number
 };
 
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD, typeof process.env.DB_PASSWORD);
-
 export default config;
