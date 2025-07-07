@@ -1,7 +1,6 @@
 import express  from "express"; // hacer npm i express
 import cors     from "cors";    // hacer npm i cors
-import config from './configs/config.js'
-import EventRouter from './router/event-router.js'
+import EventRouter from './routers/event-router.js'
 
 const app  = express();
 const port = 3000;

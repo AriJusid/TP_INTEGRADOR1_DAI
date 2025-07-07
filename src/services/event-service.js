@@ -1,11 +1,9 @@
-import EventRepo from '../repos/events-repo.js'
+import EventRepo from '../repos/event-repo.js';
 
-export default class EventService{
+const getAll = async () => {
+    const repo = new EventRepo();
+    const returnArray = await repo.getAll();
+    return returnArray;
+};
 
-    getAll = async () => {
-        const repo = new EventRepo();
-        const returnArray = await repo.getAll()
-        return returnArray
-    }
-
-}
+export { getAll };

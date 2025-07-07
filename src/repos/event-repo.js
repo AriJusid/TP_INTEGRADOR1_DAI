@@ -1,22 +1,19 @@
-import config from './../configs/config.js'
+import config from './../config/config.js'
 import pkg from 'pg'
 
 const { Pool }  = pkg;
 const pool = new Pool(config)
 
-export default class EventRepo{
+export default class EventRepo {
     getAll = async () => {
-        let alumnosArray = null
-
-        try{
-            const sql = 'SELECT * FROM alumnos'
-            const result = await pool.query(sql)
-            alumnosArray = result.rows
+        let eventosArray = null;
+        try {
+            const sql = 'SELECT * FROM events';
+            const result = await pool.query(sql);
+            eventosArray = result.rows;
+        } catch (e) {
+            console.log(e);
         }
-        
-        catch(e){
-            console.log(error)
-        }
-        return alumnosArray;
+        return eventosArray;
     }
 }
