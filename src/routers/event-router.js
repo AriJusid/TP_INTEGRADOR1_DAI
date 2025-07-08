@@ -61,60 +61,78 @@ router.get('/search', async (req, res) => {
     }
   });
   
-router.get('/:id', async (req, res) => {
-    const id = req.params.id
-    
-    try{
-        
-        console.log("Error de conexión")
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  router.get('/:id', async (req, res) => {
+    const id = req.params.id;
 
-        const sql =  `
+    try {
+        if (isNaN(id)) {
+            return res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
+        }
+
+        const sql = `
         SELECT
-        e.id,
-        e.name,
-        e.description,
-        e.start_date,
-        e.duration_in_minutes,
-        e.price,
-        e.enabled_for_enrollment,
-        el.max_capacity,
-        json_build_object(
-            'id', u.id,
-            'first_name', u.first_name,
-            'last_name', u.last_name,
-            'username', u.username
-        ),
-        json_build_object(
-            'id', el.id,
-            'name', el.name,
-            'full_address', el.full_address,
-            'latitude', el.latitude,
-            'longitude', el.longitude,
-            'max_capacity', el.max_capacity
-        )
-    FROM
-        events e
-    JOIN event_locations el ON e.id_event_location = el.id
-    JOIN users u ON e.id_creator_user = u.id;
+    events.id,
+    events.name,
+    events.description,
+    events.id_event_location,
+    events.start_date,
+    events.duration_in_minutes,
+    events.price,
+    events.enabled_for_enrollment,
+    events.max_assistance,
+    events.id_creator_user,
 
-    WHERE id= $1`
-        const values = [id]
-        let result = await pool.query(sql, values);    
+    -- Información de la ubicación del evento
+    event_locations.id AS event_location_id,
+    event_locations.id_location,
+    event_locations.name AS event_location_name,
+    event_locations.full_address,
+    event_locations.max_capacity AS event_location_max_capacity,
+    event_locations.latitude AS event_location_latitude,
+    event_locations.longitude AS event_location_longitude,
+    event_locations.id_creator_user AS event_location_creator_user,
 
-        res.status(StatusCodes.OK).send(result.rows[0]);
-    }
-    catch(error){
-        if(isNaN(id)){
-            res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
+    -- Información de la localidad
+    locations.id AS location_id,
+    locations.name AS location_name,
+    locations.id_province,
+    locations.latitude AS location_latitude,
+    locations.longitude AS location_longitude,
+
+    -- Información de la provincia
+    provinces.id AS province_id,
+    provinces.name AS province_name,
+    provinces.full_name AS province_full_name,
+    provinces.latitude AS province_latitude,
+    provinces.longitude AS province_longitude,
+
+    -- Información del creador del evento
+    creator_user.id AS creator_user_id,
+    creator_user.first_name AS creator_user_first_name,
+    creator_user.last_name AS creator_user_last_name,
+    creator_user.username AS creator_user_username
+ 
+FROM events
+JOIN event_locations ON events.id_event_location = event_locations.id
+JOIN locations ON event_locations.id_location = locations.id
+JOIN provinces ON locations.id_province = provinces.id
+JOIN users AS creator_user ON events.id_creator_user = creator_user.id
+WHERE events.id = $1;
+    
+            `;
+        
+        const values = [id]; 
+        const result = await pool.query(sql, values);
+
+        if (result.rows.length === 0) {
+            return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
         }
-        else if (!eventosArray.contains(id)){
-            res.status(StatusCodes.NOT_FOUND).send("Evento inexsitente");
-        }
 
-        console.log(error)
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+        res.status(StatusCodes.OK).json(result.rows[0]);
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
-})
+});
+
 
 export default router;
