@@ -21,25 +21,44 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
-    const id = req.params.id;
+router.get('/search', async (req, res) => {
+    const { name, start_date, tag } = req.query;
 
-    if (isNaN(id)) {
-        return res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
+  
+    let sql = 'SELECT * FROM events WHERE';
+    let values = [];
+    let conditions = [];
+  
+    if (name) {
+      conditions.push('name = $' + (conditions.length + 1)); 
+      values.push(name);
     }
-
+  
+    if (start_date) {
+      conditions.push('DATE (start_date) = $' + (conditions.length + 1));
+      values.push(start_date);
+    }
+  
+    if (tag) {
+      conditions.push('id_event_category = $' + (conditions.length + 1));
+      values.push(tag);
+    }
+  
+    sql += ' ' + conditions.join(' AND ');
+  
     try {
-        const eventReturn = await getOne(id);
-
-        if (!eventReturn || eventReturn.length === 0) {
-            return res.status(StatusCodes.NOT_FOUND).send("Evento no encontrado");
-        }
-
-        return res.status(StatusCodes.OK).send(eventReturn[0]);
+      const result = await pool.query(sql, values);
+  
+      if (result.rows.length === 0) {
+        return res.status(StatusCodes.NOT_FOUND).send('Evento inexistente');
+      }
+      return res.status(StatusCodes.OK).json(result.rows);
     } catch (error) {
-        console.log(error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+      console.log(error);
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
     }
-});
+  });
+  
+  
 
 export default router;
