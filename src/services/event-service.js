@@ -12,4 +12,10 @@ const getOne = async (name, start_date,  tag) => {
     return eventReturn;
 };
 
-export { getAll, getOne};
+const getByID= async (id) => {    
+    const repo = new EventRepo();
+    const eventReturn = await repo.getOne(id);
+    return eventReturn;
+};
+
+export { getAll, getOne, getByID};

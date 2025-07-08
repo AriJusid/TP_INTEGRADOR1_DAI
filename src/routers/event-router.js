@@ -1,7 +1,7 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne} from '../services/event-service.js'
+import {getAll, getOne, getByID} from '../services/event-service.js'
 import pkg from 'pg'
 
 const router = Router()
@@ -21,7 +21,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-//FALTA ARQUITECTURA
 
 router.get('/search', async (req, res) => {
     const { name, start_date, tag } = req.query;
@@ -39,6 +38,9 @@ router.get('/search', async (req, res) => {
     }
   });
   
+
+  //FALTA ARQUITECTURA
+
   router.get('/:id', async (req, res) => {
     const id = req.params.id;
 

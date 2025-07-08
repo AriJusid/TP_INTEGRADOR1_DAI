@@ -59,7 +59,7 @@ export default class EventRepo {
     }
   
     if (start_date) {
-      conditions.push('DATE(start_date) = $' + (conditions.length + 1)); // Ensure correct formatting here
+      conditions.push('DATE(start_date) = $' + (conditions.length + 1)); 
       values.push(start_date);
     }
   
@@ -68,27 +68,145 @@ export default class EventRepo {
       values.push(tag);
     }
   
-    // If no conditions are provided, return all events (or handle as needed)
+
     if (conditions.length === 0) {
-      sql = 'SELECT * FROM events'; // To fetch all events if no filter
+      sql = 'SELECT * FROM events'; 
     } else {
       sql += ' ' + conditions.join(' AND ');
     }
   
     try {
-      console.log('SQL Query:', sql); // Debugging query
-      console.log('Values:', values); // Debugging values
+      console.log('SQL Query:', sql); 
+      console.log('Values:', values); 
       
       const result = await pool.query(sql, values);
-      evento = result.rows[0];  // Assuming you only want the first event
+      evento = result.rows[0];  
   
-      console.log("Query Result:", evento); // Debugging result
+      console.log("Query Result:", evento); 
   
     } catch (error) {
-      console.log("Error:", error); // Log the error for debugging
+      console.log("Error:", error); 
     }
   
     return evento;
   };
+
+   getOne = async (name, start_date, tag) => {
+    let evento = null;
+  
+    let sql = 'SELECT * FROM events WHERE';
+    let values = [];
+    let conditions = [];
+  
+    if (name) {
+      conditions.push('name = $' + (conditions.length + 1)); 
+      values.push(name);
+    }
+  
+    if (start_date) {
+      conditions.push('DATE(start_date) = $' + (conditions.length + 1)); 
+      values.push(start_date);
+    }
+  
+    if (tag) {
+      conditions.push('id_event_category = $' + (conditions.length + 1));
+      values.push(tag);
+    }
+  
+    if (conditions.length === 0) {
+      sql = 'SELECT * FROM events'; 
+    } else {
+      sql += ' ' + conditions.join(' AND ');
+    }
+  
+    try {
+      console.log('SQL Query:', sql); 
+      console.log('Values:', values); 
+      
+      const result = await pool.query(sql, values);
+      evento = result.rows[0];  
+  
+      console.log("Query Result:", evento); 
+  
+    } catch (error) {
+      console.log("Error:", error); 
+    }
+  
+    return evento;
+  };
+
+  getByID = async (id) => {
+    
+    let evento = null;
+    let values = [id];
+  
+    try {
+      const sql = `
+      SELECT
+  events.id,
+  events.name,
+  events.description,
+  events.id_event_location,
+  events.start_date,
+  events.duration_in_minutes,
+  events.price,
+  events.enabled_for_enrollment,
+  events.max_assistance,
+  events.id_creator_user,
+
+  -- Información de la ubicación del evento
+  event_locations.id AS event_location_id,
+  event_locations.id_location,
+  event_locations.name AS event_location_name,
+  event_locations.full_address,
+  event_locations.max_capacity AS event_location_max_capacity,
+  event_locations.latitude AS event_location_latitude,
+  event_locations.longitude AS event_location_longitude,
+  event_locations.id_creator_user AS event_location_creator_user,
+
+  -- Información de la localidad
+  locations.id AS location_id,
+  locations.name AS location_name,
+  locations.id_province,
+  locations.latitude AS location_latitude,
+  locations.longitude AS location_longitude,
+
+  -- Información de la provincia
+  provinces.id AS province_id,
+  provinces.name AS province_name,
+  provinces.full_name AS province_full_name,
+  provinces.latitude AS province_latitude,
+  provinces.longitude AS province_longitude,
+
+  -- Información del creador del evento
+  creator_user.id AS creator_user_id,
+  creator_user.first_name AS creator_user_first_name,
+  creator_user.last_name AS creator_user_last_name,
+  creator_user.username AS creator_user_username
+
+FROM events
+JOIN event_locations ON events.id_event_location = event_locations.id
+JOIN locations ON event_locations.id_location = locations.id
+JOIN provinces ON locations.id_province = provinces.id
+JOIN users AS creator_user ON events.id_creator_user = creator_user.id
+WHERE events.id = $1;
+  
+          `
+
+      console.log('SQL Query:', sql); 
+      console.log('Values:', values); 
+      
+      const result = await pool.query(sql, values);
+      evento = result.rows[0];  
+  
+      console.log("Query Result:", evento); 
+  
+    } catch (error) {
+      console.log("Error:", error); 
+    }
+  
+    return evento;
+  };
+
   
 }
