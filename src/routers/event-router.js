@@ -25,36 +25,14 @@ router.get('/', async (req, res) => {
 
 router.get('/search', async (req, res) => {
     const { name, start_date, tag } = req.query;
-
-  
-    let sql = 'SELECT * FROM events WHERE';
-    let values = [];
-    let conditions = [];
-  
-    if (name) {
-      conditions.push('name = $' + (conditions.length + 1)); 
-      values.push(name);
-    }
-  
-    if (start_date) {
-      conditions.push('DATE (start_date) = $' + (conditions.length + 1));
-      values.push(start_date);
-    }
-  
-    if (tag) {
-      conditions.push('id_event_category = $' + (conditions.length + 1));
-      values.push(tag);
-    }
-  
-    sql += ' ' + conditions.join(' AND ');
   
     try {
-      const result = await pool.query(sql, values);
+      const result = await getOne(name, start_date,  tag);
   
-      if (result.rows.length === 0) {
+      if (!result) {
         return res.status(StatusCodes.NOT_FOUND).send('Evento inexistente');
       }
-      return res.status(StatusCodes.OK).json(result.rows);
+      return res.status(StatusCodes.OK).json(result);
     } catch (error) {
       console.log(error);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR);

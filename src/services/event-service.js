@@ -6,9 +6,9 @@ const getAll = async () => {
     return returnArray;
 };
 
-const getOne = async (values) => {    
+const getOne = async (name, start_date,  tag) => {    
     const repo = new EventRepo();
-    const eventReturn = await repo.getOne(values);
+    const eventReturn = await repo.getOne(name, start_date,  tag);
     return eventReturn;
 };
 
