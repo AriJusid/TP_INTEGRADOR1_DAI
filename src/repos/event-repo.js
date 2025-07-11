@@ -18,12 +18,12 @@ export default class EventRepo {
               e.price,
               e.enabled_for_enrollment,
               el.max_capacity,
-              json_build_object(
+              json_build_object (
                   'id', u.id,
                   'first_name', u.first_name,
                   'last_name', u.last_name,
                   'username', u.username
-              ),
+              ) AS creator,
               json_build_object(
                   'id', el.id,
                   'name', el.name,
@@ -31,13 +31,12 @@ export default class EventRepo {
                   'latitude', el.latitude,
                   'longitude', el.longitude,
                   'max_capacity', el.max_capacity
-              )
+              ) AS location
           FROM
               events e
           JOIN event_locations el ON e.id_event_location = el.id
-          JOIN users u ON e.id_creator_user = u.id;
-  
-            `;
+          JOIN users u ON e.id_creator_user = u.id;  `;
+          
       const result = await pool.query(sql);
       eventosArray = result.rows;
     } catch (e) {
@@ -49,12 +48,42 @@ export default class EventRepo {
    getOne = async (name, start_date, tag) => {
     let evento = null;
   
-    let sql = 'SELECT * FROM events WHERE';
+    let sql = `SELECT
+    e.id,
+    e.name,
+    e.description,
+    e.start_date,
+    e.duration_in_minutes,
+    e.price,
+    e.enabled_for_enrollment,
+    el.max_capacity,
+    json_build_object (
+        'id', u.id,
+        'first_name', u.first_name,
+        'last_name', u.last_name,
+        'username', u.username
+    ) AS creator,
+    json_build_object(
+        'id', el.id,
+        'name', el.name,
+        'full_address', el.full_address,
+        'latitude', el.latitude,
+        'longitude', el.longitude,
+        'max_capacity', el.max_capacity
+    ) AS location,    tags.name AS tag_names
+
+    FROM events e
+    JOIN event_locations el ON e.id_event_location = el.id
+    JOIN users u ON e.id_creator_user = u.id  
+    LEFT JOIN event_tags et ON et.id_event = e.id
+    LEFT JOIN tags ON tags.id = et.id_tag
+    WHERE`;
+
     let values = [];
     let conditions = [];
   
     if (name) {
-      conditions.push('name = $' + (conditions.length + 1)); 
+      conditions.push('e.name = $' + (conditions.length + 1)); 
       values.push(name);
     }
   
@@ -64,7 +93,7 @@ export default class EventRepo {
     }
   
     if (tag) {
-      conditions.push('id_event_category = $' + (conditions.length + 1));
+      conditions.push('tags.name = $' + (conditions.length + 1));
       values.push(tag);
     }
   
@@ -77,7 +106,8 @@ export default class EventRepo {
   
     try {
       console.log('SQL Query:', sql); 
-      console.log('Values:', values); 
+      console.log('SQL values:', values); 
+      // console.log('Values:', values); 
       
       const result = await pool.query(sql, values);
       evento = result.rows[0];  
@@ -85,51 +115,7 @@ export default class EventRepo {
       console.log("Query Result:", evento); 
   
     } catch (error) {
-      console.log("Error:", error); 
-    }
-  
-    return evento;
-  };
-
-   getOne = async (name, start_date, tag) => {
-    let evento = null;
-  
-    let sql = 'SELECT * FROM events WHERE';
-    let values = [];
-    let conditions = [];
-  
-    if (name) {
-      conditions.push('name = $' + (conditions.length + 1)); 
-      values.push(name);
-    }
-  
-    if (start_date) {
-      conditions.push('DATE(start_date) = $' + (conditions.length + 1)); 
-      values.push(start_date);
-    }
-  
-    if (tag) {
-      conditions.push('id_event_category = $' + (conditions.length + 1));
-      values.push(tag);
-    }
-  
-    if (conditions.length === 0) {
-      sql = 'SELECT * FROM events'; 
-    } else {
-      sql += ' ' + conditions.join(' AND ');
-    }
-  
-    try {
-      console.log('SQL Query:', sql); 
-      console.log('Values:', values); 
-      
-      const result = await pool.query(sql, values);
-      evento = result.rows[0];  
-  
-      console.log("Query Result:", evento); 
-  
-    } catch (error) {
-      console.log("Error:", error); 
+      //console.log("Error:", error); 
     }
   
     return evento;
@@ -182,16 +168,19 @@ export default class EventRepo {
   creator_user.id AS creator_user_id,
   creator_user.first_name AS creator_user_first_name,
   creator_user.last_name AS creator_user_last_name,
-  creator_user.username AS creator_user_username
+  creator_user.username AS creator_user_username,
+
+  -- Información de los tags
+  tags.name
 
 FROM events
 JOIN event_locations ON events.id_event_location = event_locations.id
 JOIN locations ON event_locations.id_location = locations.id
 JOIN provinces ON locations.id_province = provinces.id
 JOIN users AS creator_user ON events.id_creator_user = creator_user.id
-WHERE events.id = $1;
-  
-          `
+LEFT JOIN event_tags et ON et.id_event = e.id
+LEFT JOIN tags ON tags.id = et.id_tag
+WHERE events.id = $1;`
 
       console.log('SQL Query:', sql); 
       console.log('Values:', values); 
