@@ -23,24 +23,27 @@ router.post('/login', async (req, res) => {
         const sql =  'SELECT * FROM users WHERE username = $1 and password = $2'
         
         const values = [username, password ]
-        const result = await pool.query(sql, values);    
+        const result = await pool.query(sql, values);   
+        console.log(result.rows )
+ 
 
         const payload = {
-            id: result[0].id,
-            username: result[0].username
+            id: result.rows.id,
+            username: result.rows.username
           };
+
+        console.log("payload" + payload)
           
           const secretKey = 'mansobolazoarilu2025'; 
           
           const options = {
-            expiresIn : '1h', 
-            issuer : 'uatafac'
+            expiresIn : '1h'
           };
           
         const token = jwt.sign(payload, secretKey, options);   
 
         console.log("entro a try")
-        if(result.length === 0){
+        if(result.rows.length === 0){
             res.status(StatusCodes.UNAUTHORIZED).json({
                 sucess: "false",
                 message: "Usuario o clave inválida.",
@@ -52,7 +55,7 @@ router.post('/login', async (req, res) => {
             res.status(StatusCodes.BAD_REQUEST).json({
                 sucess: "false",
                 message: "El email es invalido.",
-                token: "esta"
+                token: token
             });
         }
 
@@ -60,7 +63,7 @@ router.post('/login', async (req, res) => {
             res.status(StatusCodes.OK).json({
                 sucess: "true",
                 message: "",
-                token: "esta"
+                token: token
             });
         }
         
