@@ -171,16 +171,16 @@ export default class EventRepo {
   creator_user.username AS creator_user_username,
 
   -- Información de los tags
-  tags.name
+  tags.name AS tag
 
-FROM events
+FROM events 
 JOIN event_locations ON events.id_event_location = event_locations.id
 JOIN locations ON event_locations.id_location = locations.id
 JOIN provinces ON locations.id_province = provinces.id
 JOIN users AS creator_user ON events.id_creator_user = creator_user.id
-LEFT JOIN event_tags et ON et.id_event = e.id
+LEFT JOIN event_tags et ON et.id_event = events.id
 LEFT JOIN tags ON tags.id = et.id_tag
-WHERE events.id = $1;`
+WHERE events.id = $1; `
 
       console.log('SQL Query:', sql); 
       console.log('Values:', values); 
@@ -188,7 +188,7 @@ WHERE events.id = $1;`
       const result = await pool.query(sql, values);
       evento = result.rows[0];  
   
-      console.log("Query Result:", evento); 
+      // console.log("Query Result:", evento); 
   
     } catch (error) {
       console.log("Error:", error); 

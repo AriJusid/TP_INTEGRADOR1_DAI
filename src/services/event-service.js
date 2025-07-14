@@ -14,7 +14,7 @@ const getOne = async (name, start_date,  tag) => {
 
 const getByID= async (id) => {    
     const repo = new EventRepo();
-    const eventReturn = await repo.getOne(id);
+    const eventReturn = await repo.getByID(id);
     return eventReturn;
 };
 
