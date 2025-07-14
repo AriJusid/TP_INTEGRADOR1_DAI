@@ -1,7 +1,8 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID} from '../services/event-service.js'
+import {logIn, signUp} from '../services/user-service.js'
+
 import pkg from 'pg'
 import jwt from 'jsonwebtoken';
 
@@ -18,13 +19,10 @@ router.post('/login', async (req, res) => {
     
     const { username, password } = req.body;
 
-    try{
-
-        const sql =  'SELECT * FROM users WHERE username = $1 and password = $2'
+    try{      
         
-        const values = [username, password ]
-        const result = await pool.query(sql, values);   
-        console.log(result.rows )
+        const result = await logIn(username, password);   
+        console.log(result.rows[0])
  
 
         const payload = {
