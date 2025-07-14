@@ -61,40 +61,27 @@ router.post("/register", async (req, res) => {
   const { first_name, last_name, username, password } = req.body;
 
   try {
-    const sql =
-      "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
-
-    const values = [first_name, last_name, username, password];
-    const result = await pool.query(sql, values);
-    console.log(result.rows);
-
+    const result = await signUp (first_name, last_name, username, password);
+    
     const payload = {
-      id: result.id,
-      username: result.username,
-    };
+        id:  result.id,
+        username:  result.username}
 
-    console.log(result.id);
-
-    const secretKey = "mansobolazoarilu2025";
-
-    const options = {
-      expiresIn: "1h",
-    };
-
-    const token = jwt.sign(payload, secretKey, options);
+      const secretKey = "mansobolazoarilu2025";
+      const options = { expiresIn: "1h" };
+      const token = jwt.sign(payload, secretKey, options);
+  
 
     console.log("entro a try");
     if (first_name.length < 3 || last_name.length < 3 || password.length < 3) {
       res.status(StatusCodes.BAD_REQUEST).json({
         sucess: "false",
         message: "Usuario o clave inválida.",
-        token: token,
       });
     } else if (!isValidEmail(username)) {
       res.status(StatusCodes.BAD_REQUEST).json({
         sucess: "false",
         message: "El email es invalido.",
-        token: token,
       });
     } else {
       res.status(StatusCodes.CREATED).json({

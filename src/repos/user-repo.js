@@ -24,26 +24,25 @@ export default class UserRepo {
     }
   };
 
-  signUp = async (name, start_date, tag) => {
-    let evento = null;
+  signUp = async (first_name, last_name, username, password) => {
+    let user = null;
 
-    let sql = ``;
+    let sql = `INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)`;
 
-    let values = [];
-    let conditions = [];
+    let values = [first_name, last_name, username, password];
 
     try {
       console.log("SQL Query:", sql);
       console.log("SQL values:", values);
 
       const result = await pool.query(sql, values);
-      evento = result.rows[0];
+      user = result;
 
-      console.log("Query Result:", evento);
+      console.log("Query Result:", user);
     } catch (error) {
       console.log("Error:", error);
     }
 
-    return evento;
+    return user;
   };
 }
