@@ -1,8 +1,9 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID} from '../services/event-service.js'
+import {getAll, getOne, getByID, createEvent} from '../services/event-service.js'
 import pkg from 'pg'
+import { authToken } from '../middleware/auth.js';
 
 const router = Router()
 
@@ -38,7 +39,7 @@ router.get('/search', async (req, res) => {
     }
   });
   
-  router.get('/:id', async (req, res) => {
+  router.get('/:id',  async (req, res) => {
     const id = req.params.id;
 
     try {
@@ -58,5 +59,52 @@ router.get('/search', async (req, res) => {
     }
 });
 
+router.post('/', authToken, async (req, res) => {
+  const { name,
+    description,
+    id_event_category,
+    id_event_location,
+    start_date,
+    duration_in_minutes,
+    price,
+    enabled_for_enrollment,
+    max_assistance,
+    id_creator_user } = req.body;
+
+  try {
+    const result = await createEvent ( name,
+      description,
+      id_event_category,
+      id_event_location,
+      start_date,
+      duration_in_minutes,
+      price,
+      enabled_for_enrollment,
+      max_assistance,
+      id_creator_user );
+
+    console.log("entro a try");
+    
+    if (first_name.length < 3 || last_name.length < 3 || password.length < 3) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        sucess: "false",
+        message: "Usuario o clave inválida.",
+      });
+    } else if (!isValidEmail(username)) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        sucess: "false",
+        message: "El email es invalido.",
+      });
+    } else {
+      res.status(StatusCodes.CREATED).json({
+        sucess: "true",
+        message: "Bienvenido!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
+});
 
 export default router;

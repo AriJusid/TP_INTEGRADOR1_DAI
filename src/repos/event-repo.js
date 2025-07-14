@@ -199,3 +199,55 @@ WHERE events.id = $1; `
 
   
 }
+
+createEvent = async (name,
+  description,
+  id_event_category,
+  id_event_location,
+  start_date,
+  duration_in_minutes,
+  price,
+  enabled_for_enrollment,
+  max_assistance,
+  id_creator_user) => {
+
+  let event = null
+
+  let sql = `INSERT INTO events (
+    name,
+   description,
+   id_event_category,
+   id_event_location,
+    start_date,
+    duration_in_minutes,
+   price,
+    enabled_for_enrollment,
+    max_assistance,
+    id_creator_user
+  ) VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+  );`;
+      
+  let values = [name,
+    description,
+    id_event_category,
+    id_event_location,
+     start_date,
+     duration_in_minutes,
+    price,
+     enabled_for_enrollment,
+     max_assistance,
+     id_creator_user]
+
+  try {
+    console.log("SQL Query:", sql);
+    console.log("SQL values:", values);
+    const result = await pool.query(sql, values);
+    evento = result;
+  } catch (e) {
+    console.log("Error:" + e);
+  }
+  return evento;
+};
+
+

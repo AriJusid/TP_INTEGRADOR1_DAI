@@ -18,4 +18,28 @@ const getByID= async (id) => {
     return eventReturn;
 };
 
-export { getAll, getOne, getByID};
+const createEvent = async (name,
+    description,
+    id_event_category,
+    id_event_location,
+    start_date,
+    duration_in_minutes,
+    price,
+    enabled_for_enrollment,
+    max_assistance,
+    id_creator_user ) => {    
+    const repo = new EventRepo();
+    const eventReturn = await repo.createEvent(name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        id_creator_user );
+    return eventReturn;
+};
+
+export { getAll, getOne, getByID, createEvent};
