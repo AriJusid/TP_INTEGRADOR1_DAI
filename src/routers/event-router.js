@@ -73,11 +73,13 @@ router.post('/', authToken, async (req, res) => {
     
     console.log("Hello")
 
+    const location = await getLocationByID(id_event_location);
+
   try {
     
     console.log("entro a try");
     
-    if (name.length < 3 || description.length < 3 || price < 0 || duration_in_minutes < 0 || max_assistance > getLocationByID(id_event_location)){
+    if (name.length < 3 || description.length < 3 || price < 0 || duration_in_minutes < 0 || max_assistance > location.max_capacity){
       res.status(StatusCodes.BAD_REQUEST).json({
         success: "false",
         message: "No se pudo crear el evento",
@@ -100,6 +102,8 @@ router.post('/', authToken, async (req, res) => {
         enabled_for_enrollment,
         max_assistance,
         id_creator_user );
+
+        console.log(result)
 
       res.status(StatusCodes.CREATED).json({
         success: "true",

@@ -44,8 +44,8 @@ const createEvent = async (name,
 
 const getLocationByID = async (id) =>{
     const repo = new EventRepo();
-    const eventReturn = await repo.getLocationByID(id);
-    return eventReturn;
+    const location = await repo.getLocationByID(id);
+    return location;
 }
 
 
