@@ -197,8 +197,6 @@ WHERE events.id = $1; `
     return evento;
   };
 
-  
-}
 
 createEvent = async (name,
   description,
@@ -212,7 +210,6 @@ createEvent = async (name,
   id_creator_user) => {
 
   let event = null
-
   let sql = `INSERT INTO events (
     name,
    description,
@@ -225,8 +222,7 @@ createEvent = async (name,
     max_assistance,
     id_creator_user
   ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
-  );`;
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`;
       
   let values = [name,
     description,
@@ -243,11 +239,34 @@ createEvent = async (name,
     console.log("SQL Query:", sql);
     console.log("SQL values:", values);
     const result = await pool.query(sql, values);
-    evento = result;
+    event = result.rows[0];
   } catch (e) {
-    console.log("Error:" + e);
+    console.log(e);
   }
+  return event;
+};
+
+getLocationByID = async (id) => {
+    
+  let evento = null;
+  let values = [id];
+
+  try {
+    const sql = `
+    SELECT max_capacity
+FROM event_locations 
+WHERE event_locations.id = $1;`
+
+    console.log('SQL Query:', sql); 
+    console.log('Values:', values); 
+    
+    const result = await pool.query(sql, values);
+    evento = result.rows[0];  
+  } catch (error) {
+    console.log("Error:", error); 
+  }
+
   return evento;
 };
 
-
+}

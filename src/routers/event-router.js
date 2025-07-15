@@ -1,9 +1,10 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID, createEvent} from '../services/event-service.js'
+import {getAll, getOne, getByID, createEvent, getLocationByID} from '../services/event-service.js'
 import pkg from 'pg'
 import { authToken } from '../middleware/auth.js';
+import JsonWebTokenError from 'jsonwebtoken';
 
 const router = Router()
 
@@ -41,7 +42,6 @@ router.get('/search', async (req, res) => {
   
   router.get('/:id',  async (req, res) => {
     const id = req.params.id;
-
     try {
         const result = await getByID(id);
 
@@ -70,35 +70,40 @@ router.post('/', authToken, async (req, res) => {
     enabled_for_enrollment,
     max_assistance,
     id_creator_user } = req.body;
+    
+    console.log("Hello")
 
   try {
-    const result = await createEvent ( name,
-      description,
-      id_event_category,
-      id_event_location,
-      start_date,
-      duration_in_minutes,
-      price,
-      enabled_for_enrollment,
-      max_assistance,
-      id_creator_user );
-
+    
     console.log("entro a try");
     
-    if (first_name.length < 3 || last_name.length < 3 || password.length < 3) {
+    if (name.length < 3 || description.length < 3 || price < 0 || duration_in_minutes < 0 || max_assistance > getLocationByID(id_event_location)){
       res.status(StatusCodes.BAD_REQUEST).json({
-        sucess: "false",
-        message: "Usuario o clave inválida.",
+        success: "false",
+        message: "No se pudo crear el evento",
       });
-    } else if (!isValidEmail(username)) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        sucess: "false",
-        message: "El email es invalido.",
+    } else if (typeof(req.user) === "undefined") {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        success: "false",
+        message: "Debe iniciar sesión primero",
       });
-    } else {
+    } 
+    
+    else {
+      const result = await createEvent ( name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        id_creator_user );
+
       res.status(StatusCodes.CREATED).json({
-        sucess: "true",
-        message: "Bienvenido!",
+        success: "true",
+        message: "Evento creado!",
       });
     }
   } catch (error) {

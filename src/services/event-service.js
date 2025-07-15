@@ -42,4 +42,11 @@ const createEvent = async (name,
     return eventReturn;
 };
 
-export { getAll, getOne, getByID, createEvent};
+const getLocationByID = async (id) =>{
+    const repo = new EventRepo();
+    const eventReturn = await repo.getLocationByID(id);
+    return eventReturn;
+}
+
+
+export { getAll, getOne, getByID, createEvent, getLocationByID};

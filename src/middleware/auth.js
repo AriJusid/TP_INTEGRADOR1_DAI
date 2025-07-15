@@ -13,9 +13,9 @@ export function authToken (req, res, next) {
     try {
         const auth =  jwt.verify(token, "mansobolazoarilu2025");
         req.user = auth;
-        next()
     } catch (e) {
     console.error(e);
     }
+    next()
     console.log(payloadOriginal)
 }
