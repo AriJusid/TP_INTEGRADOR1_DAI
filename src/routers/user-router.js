@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
       };
   
       const secretKey = "mansobolazoarilu2025";
-      const options = { expiresIn: "1h" };
+      const options = { expiresIn: "7d" };
       const token = jwt.sign(payload, secretKey, options);
   
       return res.status(StatusCodes.OK).json({

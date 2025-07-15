@@ -271,4 +271,56 @@ WHERE event_locations.id = $1;`
   return evento;
 };
 
+updateEvent = async (id,
+  name,
+  description,
+  id_event_category,
+  id_event_location,
+  start_date,
+  duration_in_minutes,
+  price,
+  enabled_for_enrollment,
+  max_assistance,
+  id_creator_user
+) => {
+  let event = null;
+  let sql = `UPDATE events SET
+  name = $2,
+  description = $3,
+  id_event_category = $4,
+  id_event_location = $5,
+  start_date = $6,
+  duration_in_minutes = $7,
+  price = $8,
+  enabled_for_enrollment = $9,
+  max_assistance = $10,
+  id_creator_user = $11
+WHERE id = $1
+RETURNING *;`
+
+  let values = [
+    id,
+    name,
+    description,
+    id_event_category,
+    id_event_location,
+    start_date,
+    duration_in_minutes,
+    price,
+    enabled_for_enrollment,
+    max_assistance,
+    id_creator_user
+  ];
+
+  try {
+    console.log("SQL Query:", sql);
+    console.log("SQL values:", values);
+    const result = await pool.query(sql, values);
+    event = result.rows[0]; 
+  } catch (e) {
+    console.log(e);
+  }
+  return event;
+};
+
 }

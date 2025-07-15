@@ -1,7 +1,7 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID, createEvent, getLocationByID} from '../services/event-service.js'
+import {getAll, getOne, getByID, createEvent, getLocationByID, updateEvent} from '../services/event-service.js'
 import pkg from 'pg'
 import { authToken } from '../middleware/auth.js';
 import JsonWebTokenError from 'jsonwebtoken';
@@ -115,5 +115,73 @@ router.post('/', authToken, async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
 });
+
+router.put('/:id', authToken, async (req, res) => {
+  const { name,
+    description,
+    id_event_category,
+    id_event_location,
+    start_date,
+    duration_in_minutes,
+    price,
+    enabled_for_enrollment,
+    max_assistance,
+    id_creator_user } = req.body;
+
+    const id = req.params.id;
+
+    console.log(req.user)
+    
+    console.log("Hello")
+
+    const location = await getLocationByID(id_event_location);
+
+  try {
+    console.log("entro a try");
+    
+    if (name.length < 3 || description.length < 3 || price < 0 || duration_in_minutes < 0 || max_assistance > location.max_capacity){
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: "false",
+        message: "No se pudo actualizar el evento",
+      });
+    } else if (typeof(req.user) === "undefined") {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        success: "false",
+        message: "Debe iniciar sesión primero",
+      });
+    }     
+    else {
+      const result = await updateEvent ( id, name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        id_creator_user );
+
+        console.log(result)
+
+        if (!result){
+          res.status(StatusCodes.NOT_FOUND).json({
+            success: "false",
+            message: "Evento inexistente",
+        })
+      }
+      else{
+        res.status(StatusCodes.SUCCESS).json({
+          success: "true",
+          message: "Evento actualizado!",
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
+});
+
 
 export default router;
