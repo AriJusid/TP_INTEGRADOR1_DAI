@@ -193,7 +193,7 @@ router.delete('/:id',  authToken, async (req, res) => {
       //   return res.status(StatusCodes.BAD_REQUEST).send("Existe al menos un usuario registrado al evento");
       // }
 
-      if (typeof(req.user) === "undefined") {
+      if (typeof(result) === "undefined") {
         res.status(StatusCodes.UNAUTHORIZED).json({
           success: "false",
           message: "Debe iniciar sesión primero",
