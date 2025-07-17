@@ -284,19 +284,20 @@ updateEvent = async (id,
   id_creator_user
 ) => {
   let event = null;
-  let sql = `UPDATE events SET
-  name = $2,
-  description = $3,
-  id_event_category = $4,
-  id_event_location = $5,
-  start_date = $6,
-  duration_in_minutes = $7,
-  price = $8,
-  enabled_for_enrollment = $9,
-  max_assistance = $10,
-  id_creator_user = $11
-WHERE id = $1
-RETURNING *;`
+//   let sql = `UPDATE events SET
+//   name = $2,
+//   description = $3,
+//   id_event_category = $4,
+//   id_event_location = $5,
+//   start_date = $6,
+//   duration_in_minutes = $7,
+//   price = $8,
+//   enabled_for_enrollment = $9,
+//   max_assistance = $10,
+//   id_creator_user = $11
+// WHERE id = $1
+// RETURNING *;`
+let sql = `SELECT * FROM events WHERE id = 8`
 
   let values = [
     id,
@@ -313,14 +314,36 @@ RETURNING *;`
   ];
 
   try {
+    console.log("id:", id)
     console.log("SQL Query:", sql);
     console.log("SQL values:", values);
     const result = await pool.query(sql, values);
+    console.log("result:", result)
     event = result.rows[0]; 
   } catch (e) {
     console.log(e);
   }
   return event;
 };
+
+deleteEvent = async (id) => {
+    
+  let evento = null;
+  let values = [id];
+
+  try {
+    const sql = `DELETE FROM events WHERE id = $1 RETURNING *;`
+
+    const result = await pool.query(sql, values);
+
+    evento = result.rows[0];  
+
+  } catch (error) {
+    console.log("Error:", error); 
+  }
+
+  return evento;
+};
+
 
 }

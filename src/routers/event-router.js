@@ -1,10 +1,9 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID, createEvent, getLocationByID, updateEvent} from '../services/event-service.js'
+import {getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent} from '../services/event-service.js'
 import pkg from 'pg'
 import { authToken } from '../middleware/auth.js';
-import JsonWebTokenError from 'jsonwebtoken';
 
 const router = Router()
 
@@ -128,9 +127,7 @@ router.put('/:id', authToken, async (req, res) => {
     max_assistance,
     id_creator_user } = req.body;
 
-    const id = req.params.id;
-
-    console.log(req.user)
+    const id = parseInt(req.params.id);
     
     console.log("Hello")
 
@@ -180,6 +177,39 @@ router.put('/:id', authToken, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
+});
+
+router.delete('/:id',  authToken, async (req, res) => {
+  const id = req.params.id;
+  try {
+      const result = await deleteEvent(id);
+
+      if (isNaN(id)) {
+          return res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
+      } 
+
+      // if(result.enabled_for_enrollment){
+      //   return res.status(StatusCodes.BAD_REQUEST).send("Existe al menos un usuario registrado al evento");
+      // }
+
+      if (typeof(req.user) === "undefined") {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: "false",
+          message: "Debe iniciar sesión primero",
+        });
+      }  
+
+      if (!result) {
+          return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
+      }
+
+      res.status(StatusCodes.OK).json({
+        success: "true",
+        message: "Evento eliminado!",
+      });
+  } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
 });
 

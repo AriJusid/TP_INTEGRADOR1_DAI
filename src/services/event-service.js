@@ -72,5 +72,10 @@ const updateEvent = async (id, name,
     return location;
 }
 
+const deleteEvent = async (id) =>{
+    const repo = new EventRepo();
+    const result = await repo.deleteEvent(id);
+    return result;
+}
 
-export { getAll, getOne, getByID, createEvent, getLocationByID, updateEvent};
+export { getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent};
