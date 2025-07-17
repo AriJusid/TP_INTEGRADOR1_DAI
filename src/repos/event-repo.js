@@ -345,5 +345,21 @@ deleteEvent = async (id) => {
   return evento;
 };
 
+getUsersByEvent = async (id) =>{
+
+  try{
+        const sql = `
+        SELECT u.id, u.first_name, u.last_name, u.username
+        FROM users u
+        INNER JOIN event_enrollments ee ON u.id = ee.id_user
+        WHERE ee.id_event = $1
+    `;
+    const { rows } = await pool.query(sql, [id]);
+  }catch(e){
+    console.log(e)
+  }
+    return rows;
+}
+
 
 }

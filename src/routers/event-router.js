@@ -1,7 +1,7 @@
 import config from '../config/config.js'
 import { ReasonPhrases, StatusCodes} from 'http-status-codes';
 import { Router } from 'express';
-import {getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent} from '../services/event-service.js'
+import {getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, isValidDate, fetchEventUsers, newEnrollment} from '../services/event-service.js'
 import pkg from 'pg'
 import { authToken } from '../middleware/auth.js';
 
@@ -189,9 +189,9 @@ router.delete('/:id',  authToken, async (req, res) => {
           return res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
       } 
 
-      // if(result.enabled_for_enrollment){
-      //   return res.status(StatusCodes.BAD_REQUEST).send("Existe al menos un usuario registrado al evento");
-      // }
+       if(result.max_assistance > 0){
+         return res.status(StatusCodes.BAD_REQUEST).send("Existe al menos un usuario registrado al evento");
+       }
 
       if (typeof(result) === "undefined") {
         res.status(StatusCodes.UNAUTHORIZED).json({
@@ -213,5 +213,46 @@ router.delete('/:id',  authToken, async (req, res) => {
   }
 });
 
+router.post('/:id/enrollment',  authToken, async (req, res) => {
+  const id = req.params.id;
+  try {
+      if (result.max_assistance) {
+          return res.status(StatusCodes.BAD_REQUEST).send("Capacidad excedida");
+      } 
+
+      if (!isValidDate(result.start_date)) {
+        return res.status(StatusCodes.BAD_REQUEST).send("Fecha inválida");
+      }
+
+      if (!result.enabled_for_enrollment) {
+        return res.status(StatusCodes.BAD_REQUEST).send("No se pudo inscribir al evento.");
+      }
+
+      if (fetchEventUsers(id).includes(req.user)) {
+        return res.status(StatusCodes.BAD_REQUEST).send("Usted ya está inscripto!");
+      }
+
+      if (typeof(result) === "undefined") {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: "false",
+          message: "Debe iniciar sesión primero",
+        });
+      }  
+
+      if (!result) {
+          return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
+      }
+    
+      const result = await newEnrollment((id, userID));
+
+      res.status(StatusCodes.CREATED).json({
+        success: "true",
+        message: "Inscrpición exitosa!",
+      });
+
+  } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
+});
 
 export default router;

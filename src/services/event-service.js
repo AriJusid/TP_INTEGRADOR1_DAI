@@ -78,4 +78,25 @@ const deleteEvent = async (id) =>{
     return result;
 }
 
-export { getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent};
+const isValidDate = async(start_date) =>{
+   
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    start_date.setHours(0, 0, 0, 0);
+  
+    return start_date <= today;
+  }
+
+const fetchEventUsers = async(eventId) =>{
+    const repo = new EventRepo();
+    const result = await repo.getUsersByEvent(eventId);
+    return result 
+}
+
+const newEnrollment = async (eventID, userID) => {    
+    const repo = new EventRepo();
+    const result = await repo.createEvent(eventID, userID);
+    return result;
+};
+
+export { isValidDate, fetchEventUsers, getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, newEnrollment};
