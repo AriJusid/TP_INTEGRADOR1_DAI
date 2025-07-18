@@ -1,3 +1,4 @@
+import e from 'cors';
 import EventRepo from '../repos/event-repo.js';
 
 const getAll = async () => {
@@ -95,7 +96,7 @@ const fetchEventUsers = async(eventId) =>{
 
 const newEnrollment = async (eventID, userID) => {    
     const repo = new EventRepo();
-    const result = await repo.createEvent(eventID, userID);
+    const result = await repo.newEnrollment(eventID, userID);
     return result;
 };
 
