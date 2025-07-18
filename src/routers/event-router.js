@@ -246,62 +246,36 @@ router.delete("/:id", authToken, async (req, res) => {
 });
 
 router.post("/:id/enrollment", authToken, async (req, res) => {
-  const id = req.params.id;
-  console.log("0")
+  const id = parseInt(req.params.id);  
+
   try {
-    const eventSelect = await getByID(id)
-    console.log("0.1")
+    const eventSelect = await getByID(id);
     if (!eventSelect.max_assistance) {
-      console.log("1")
       return res.status(StatusCodes.BAD_REQUEST).send("Capacidad excedida");
-    }
-
-    else if (
-      !isValidDate(eventSelect.start_date)) {
-        console.log("2")
+    } else if (!isValidDate(eventSelect.start_date)) {
       return res.status(StatusCodes.BAD_REQUEST).send("Fecha inválida");
-    }
-
-    else if (!eventSelect.enabled_for_enrollment) {
-      console.log("3")
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .send("No se pudo inscribir al evento.");
-    }
-
-    else if (
-      fetchEventUsers(id).includes(req.auth.id)) {
-        console.log("4")
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .send("Usted ya está inscripto!");
-    }
-
-    else if (typeof eventSelect === "undefined") {
-      console.log("5")
-      res.status(StatusCodes.UNAUTHORIZED).json({
+    } else if (!eventSelect.enabled_for_enrollment) {
+      return res.status(StatusCodes.BAD_REQUEST).send("No se pudo inscribir al evento.");
+    } else if ((await fetchEventUsers(id)).includes(req.user.id)) {
+      return res.status(StatusCodes.BAD_REQUEST).send("Usted ya está inscripto!");
+    } else if (typeof eventSelect === "undefined") {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         success: "false",
         message: "Debe iniciar sesión primero",
       });
-    }
-
-    else if(!eventSelect) {
-      console.log("6")
+    } else if (!eventSelect) {
       return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
-    }
+    } else {      
+      console.log(id, req.user.id)
 
-    else{
-      console.log("ARiiiiiiiiiiiiiiiiiiii")
-    const result = await newEnrollment((id, req.auth.id));
-
-    res.status(StatusCodes.CREATED).json({
-      success: "true",
-      message: "Inscrpición exitosa!",
-    });
+      const result = await newEnrollment(id, req.user.id);
+      res.status(StatusCodes.CREATED).json({
+        success: "true",
+        message: "Inscripción exitosa!",
+      });
     }
   } catch (error) {
-    console.log("errr")
-    console.log(error.message)
+    console.log(error)
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
 });

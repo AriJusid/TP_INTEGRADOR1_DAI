@@ -345,43 +345,28 @@ deleteEvent = async (id) => {
   return evento;
 };
 
-getUsersByEvent = async (id) =>{
-
-  let users = []
-  try{
-        const sql = `
-        SELECT u.id
-        FROM users u
-        INNER JOIN event_enrollments ee ON u.id = ee.id_user
-        WHERE ee.id_event = $1
-    `;
-    users  = await pool.query(sql, [id]);
-  }catch(e){
-    console.log(e)
+getUsersByEvent = async (id) => {
+  let users = [];
+  try {
+    const sql = `SELECT u.id FROM users u INNER JOIN event_enrollments ee ON u.id = ee.id_user WHERE ee.id_event = $1`;
+    const result = await pool.query(sql, [id]);
+    users = result.rows.map(u => u.id);
+  } catch (e) {
+    console.log(e);
   }
-    return users;
+  return users;
 }
 
-newEnrollment = async (eventID, userID) =>{
+newEnrollment = async (eventID, userID) => {
   let enroll = null;
-
-  let sql = `INSERT INTO event_enrollments (first_name, last_name, username, password) VALUES ($1, $2, 'First enrollment', '2025-07-18 11:34:59', 1, 'No observations',  5   )`;
-
-    let values = [eventID, userID];
-
-    try {
-      console.log("SQL Query:", sql);
-      console.log("SQL values:", values);
-
-      const result = await pool.query(sql, values);
-      enroll = result;
-
-      console.log("Query Result:", enroll);
-    } catch (error) {
-      console.log("Error:", error);
-    }
-
-    return enroll;
+  let sql = `INSERT INTO event_enrollments (id_event, id_user) VALUES ($1, $2) RETURNING *`;
+  let values = [eventID, userID];
+  try {
+    const result = await pool.query(sql, values);
+    enroll = result.rows[0];
+  } catch (error) {
+    console.log("Error:", error);
   }
-
+  return enroll;
+}
 }
