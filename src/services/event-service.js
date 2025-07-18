@@ -106,4 +106,5 @@ const deleteEnrollment = async (eventID, userID) => {
     return result;
 };
 
-export { isValidDate, fetchEventUsers, getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, newEnrollment, deleteEnrollment};
+
+export { isValidDate,  fetchEventUsers, getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, newEnrollment, deleteEnrollment};

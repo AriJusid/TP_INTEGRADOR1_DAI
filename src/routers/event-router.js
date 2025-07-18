@@ -12,7 +12,7 @@ import {
   isValidDate,
   fetchEventUsers,
   newEnrollment,
-  deleteEnrollment
+  deleteEnrollment,
 } from "../services/event-service.js";
 import pkg from "pg";
 import { authToken } from "../middleware/auth.js";
@@ -21,8 +21,6 @@ const router = Router();
 
 const { Pool } = pkg;
 const pool = new Pool(config);
-
-let eventosArray = [];
 
 router.get("/", async (req, res) => {
   try {
