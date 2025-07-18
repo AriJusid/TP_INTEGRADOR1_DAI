@@ -12,6 +12,7 @@ import {
   isValidDate,
   fetchEventUsers,
   newEnrollment,
+  deleteEnrollment
 } from "../services/event-service.js";
 import pkg from "pg";
 import { authToken } from "../middleware/auth.js";
@@ -272,6 +273,37 @@ router.post("/:id/enrollment", authToken, async (req, res) => {
       res.status(StatusCodes.CREATED).json({
         success: "true",
         message: "Inscripción exitosa!",
+      });
+    }
+  } catch (error) {
+    console.log(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+  }
+});
+
+router.delete("/:id/enrollment", authToken, async (req, res) => {
+  const id = parseInt(req.params.id);  
+
+  try {
+    const eventSelect = await getByID(id);
+    if (!isValidDate(eventSelect.start_date)) {
+      return res.status(StatusCodes.BAD_REQUEST).send("Fecha inválida");
+    }  else if (!(await fetchEventUsers(id)).includes(req.user.id)) {
+      return res.status(StatusCodes.BAD_REQUEST).send("Usted no está inscripto!");
+    } else if (typeof eventSelect === "undefined") {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        success: "false",
+        message: "Debe iniciar sesión primero",
+      });
+    } else if (!eventSelect) {
+      return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
+    } else {      
+      console.log(id, req.user.id)
+
+      const result = await deleteEnrollment(id, req.user.id);
+      res.status(StatusCodes.CREATED).json({
+        success: "true",
+        message: "Inscripción removida!",
       });
     }
   } catch (error) {

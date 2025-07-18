@@ -369,4 +369,18 @@ newEnrollment = async (eventID, userID) => {
   }
   return enroll;
 }
+
+deleteEnrollment = async (eventID, userID) => {
+  let enroll = null;
+  let sql = `DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2 RETURNING *`;
+  let values = [eventID, userID];
+  try {
+    const result = await pool.query(sql, values);
+    enroll = result.rows[0];
+  } catch (error) {
+    console.log("Error:", error);
+  }
+  return enroll;
+}
+
 }
