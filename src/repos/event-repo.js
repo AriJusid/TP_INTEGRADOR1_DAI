@@ -329,14 +329,19 @@ updateEvent = async (id,
 deleteEvent = async (id) => {
     
   let evento = null;
+  let eventTags = null;
   let values = [id];
 
   try {
     const sql = `DELETE FROM events WHERE id = $1 RETURNING *;`
+    const sql1 = `DELETE FROM event_tags WHERE id_event = $1 RETURNING *;`
 
     const result = await pool.query(sql, values);
+    const result1 = await pool.query(sql1, values);
 
-    evento = result.rows[0];  
+    evento = result.rows;
+    console.log(evento)  
+    eventTags = result1.rows[0];
 
   } catch (error) {
     console.log("Error:", error); 
