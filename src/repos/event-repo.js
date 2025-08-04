@@ -225,6 +225,12 @@ WHERE events.id = $1; `
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
     ) RETURNING *;`;
+
+    let enrollment = 0;
+
+    if(enabled_for_enrollment){
+      enrollment = 1;
+    }
   
     let values = [
       name,
@@ -234,7 +240,7 @@ WHERE events.id = $1; `
       start_date,
       duration_in_minutes,
       price,
-      enabled_for_enrollment,
+      enrollment,
       max_assistance,
       id_creator_user
     ];

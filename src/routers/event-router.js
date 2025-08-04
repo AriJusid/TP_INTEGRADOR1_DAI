@@ -70,6 +70,8 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", authToken, async (req, res) => {
+  const { id } = req.user
+
   const {
     name,
     description,
@@ -80,12 +82,14 @@ router.post("/", authToken, async (req, res) => {
     price,
     enabled_for_enrollment,
     max_assistance,
-    id_creator_user,
   } = req.body;
+
+  const id_creator_user = id
 
   console.log("Hello");
 
   const location = await getLocationByID(id_event_location);
+  console.log("location:", location)
 
   try {
     console.log("entro a try");
@@ -95,7 +99,7 @@ router.post("/", authToken, async (req, res) => {
       description.length < 3 ||
       price < 0 ||
       duration_in_minutes < 0 ||
-      max_assistance > location.max_capacity
+      max_assistance > location
     ) {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: "false",
