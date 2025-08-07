@@ -216,6 +216,7 @@ router.put("/:id", authToken, async (req, res) => {
 router.delete("/:id", authToken, async (req, res) => {
   const id = req.params.id;
   try {
+    console
     const result = await deleteEvent(id);
 
     if (isNaN(id)) {

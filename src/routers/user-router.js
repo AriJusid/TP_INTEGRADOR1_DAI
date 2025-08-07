@@ -24,6 +24,8 @@ router.post("/login", async (req, res) => {
         message: "El email es invalido.",
       });
     }
+
+    console.log(username, password)
   
     try {
       const result = await logIn(username, password); 
@@ -36,6 +38,7 @@ router.post("/login", async (req, res) => {
       }
   
       const user = result[0];
+
       const payload = {
         id: user.id,
         username: user.username,
@@ -44,6 +47,8 @@ router.post("/login", async (req, res) => {
       const secretKey = "mansobolazoarilu2025";
       const options = { expiresIn: "7d" };
       const token = jwt.sign(payload, secretKey, options);
+
+      console.log(token)
   
       return res.status(StatusCodes.OK).json({
         success: "true",

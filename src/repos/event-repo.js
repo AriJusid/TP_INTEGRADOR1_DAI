@@ -342,8 +342,8 @@ deleteEvent = async (id) => {
     const sql = `DELETE FROM events WHERE id = $1 RETURNING *;`
     const sql1 = `DELETE FROM event_tags WHERE id_event = $1 RETURNING *;`
 
-    const result = await pool.query(sql, values);
-    const result1 = await pool.query(sql1, values);
+    const result = await pool.query(sql1, values);
+    const result1 = await pool.query(sql, values);
 
     evento = result.rows;
     console.log(evento)  
