@@ -150,10 +150,12 @@ router.put("/:id", authToken, async (req, res) => {
     max_assistance,
     id_creator_user,
   } = req.body;
+  let entidad = req.body
+  entidad.id =  parseInt(req.params.id);
 
   const id = parseInt(req.params.id);
 
-  console.log("Hello");
+  console.log("Hello",  entidad);
 
   const location = await getLocationByID(id_event_location);
 
@@ -177,19 +179,7 @@ router.put("/:id", authToken, async (req, res) => {
         message: "Debe iniciar sesión primero",
       });
     } else {
-      const result = await updateEvent(
-        id,
-        name,
-        description,
-        id_event_category,
-        id_event_location,
-        start_date,
-        duration_in_minutes,
-        price,
-        enabled_for_enrollment,
-        max_assistance,
-        id_creator_user
-      );
+      const result = await updateEvent(entidad);
 
       //console.log(result);
 
@@ -254,6 +244,8 @@ router.post("/:id/enrollment", authToken, async (req, res) => {
 
   try {
     const eventSelect = await getByID(id);
+    console.log(eventSelect, id)
+
     if (!eventSelect.max_assistance) {
       return res.status(StatusCodes.BAD_REQUEST).send("Capacidad excedida");
     } else if (!isValidDate(eventSelect.start_date)) {

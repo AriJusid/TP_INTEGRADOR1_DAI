@@ -49,27 +49,9 @@ const getLocationByID = async (id) =>{
     return location;
 }
 
-const updateEvent = async (id, name,
-    description,
-    id_event_category,
-    id_event_location,
-    start_date,
-    duration_in_minutes,
-    price,
-    enabled_for_enrollment,
-    max_assistance,
-    id_creator_user) =>{
+const updateEvent = async (entidad) =>{
     const repo = new EventRepo();
-    const location = await repo.updateEvent(id, name,
-        description,
-        id_event_category,
-        id_event_location,
-        start_date,
-        duration_in_minutes,
-        price,
-        enabled_for_enrollment,
-        max_assistance,
-        id_creator_user);
+    const location = await repo.updateEvent(entidad);
     return location;
 }
 

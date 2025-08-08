@@ -277,18 +277,7 @@ WHERE event_locations.id = $1;`
   return evento;
 };
 
-updateEvent = async (id,
-  name,
-  description,
-  id_event_category,
-  id_event_location,
-  start_date,
-  duration_in_minutes,
-  price,
-  enabled_for_enrollment,
-  max_assistance,
-  id_creator_user
-) => {
+updateEvent = async (entidad) => {
   let event = null;
    let sql = `UPDATE events SET
    name = $2,
@@ -305,21 +294,23 @@ updateEvent = async (id,
   RETURNING *;`
 
   let values = [
-    id,
-    name,
-    description,
-    id_event_category,
-    id_event_location,
-    start_date,
-    duration_in_minutes,
-    price,
-    enabled_for_enrollment,
-    max_assistance,
-    id_creator_user
+    entidad.id,
+    entidad.name,
+    entidad.description,
+    entidad.id_event_category,
+    entidad.id_event_location,
+    entidad.start_date,
+    entidad.duration_in_minutes,
+    entidad.price,
+    entidad.enabled_for_enrollment ? "1" :"0",
+    entidad.max_assistance,
+    entidad.id_creator_user
   ];
 
+console.log('entidad enm el repo', entidad)
+
   try {
-    console.log("id:", id)
+    console.log("id:", entidad.id)
     console.log("SQL Query:", sql);
     console.log("SQL values:", values);
     console.log("SQL values length:", values.length);
@@ -327,7 +318,7 @@ updateEvent = async (id,
     //console.log("result:", result)
     event = result.rows[0]; 
   } catch (e) {
-    console.log(e.message);
+    console.log('ERROR', e.message);
   }
   return event;
 };
