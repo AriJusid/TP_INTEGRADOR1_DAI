@@ -16,6 +16,7 @@ export default class EventRepo {
               e.start_date,
               e.duration_in_minutes,
               e.price,
+              e.max_assistance,
               e.enabled_for_enrollment,
               el.max_capacity,
               json_build_object (
