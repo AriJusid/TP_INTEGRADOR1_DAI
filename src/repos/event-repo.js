@@ -36,7 +36,8 @@ export default class EventRepo {
           FROM
               events e
           JOIN event_locations el ON e.id_event_location = el.id
-          JOIN users u ON e.id_creator_user = u.id;  `;
+          JOIN users u ON e.id_creator_user = u.id  
+          ORDER BY e.start_date;`;
           
       const result = await pool.query(sql);
       eventosArray = result.rows;
