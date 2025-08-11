@@ -3,19 +3,25 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Router } from "express";
 import { getEventLocations, getEventLocationByID } from "../services/locations-service.js";
 
+
 import pkg from "pg";
 import { authToken } from "../middleware/auth.js";
 
+
 const router = Router();
+
 
 const { Pool } = pkg;
 const pool = new Pool(config);
 
 
 
+
+
+
 router.get("/", authToken, async (req, res) => {
     console.log("a")
-  
+ 
     try {
       if (req.user === "undefined") {
         return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -23,7 +29,7 @@ router.get("/", authToken, async (req, res) => {
           message: "Debe iniciar sesión primero",
         });
       }else{
-        const returnArray = await getEventLocations();
+        const returnArray = await getEventLocations(req.user.id);
         return res.status(StatusCodes.OK).json(returnArray);
       }
     } catch (error) {
@@ -32,13 +38,14 @@ router.get("/", authToken, async (req, res) => {
         .json({ message: "Internal server error" });
     }
   });
-  
+ 
   router.get("/:id", authToken, async (req, res) => {
     const id = parseInt(req.params.id);  
-  
+ 
     try {
-      const result = await getEventLocationByID(id);
-  
+      const result = await getEventLocationByID(req.user.id, id);
+
+
       if (req.user === "undefined") {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           success: "false",
@@ -52,12 +59,12 @@ router.get("/", authToken, async (req, res) => {
       else{
         return res.status(StatusCodes.OK).json(result);
       }
-      
+     
     } catch (error) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ message: "Internal server error" });
     }
   });
-  
+ 
   export default router;

@@ -88,5 +88,11 @@ const deleteEnrollment = async (eventID, userID) => {
     return result;
 };
 
+const verifyEnrollment = async (eventID, userID) => {    
+    const repo = new EventRepo();
+    const result = await repo.verifyEnrollment(eventID, userID);
+    return result;
+};
 
-export { isValidDate,  fetchEventUsers, getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, newEnrollment, deleteEnrollment};
+
+export { verifyEnrollment, isValidDate,  fetchEventUsers, getAll, getOne, getByID, createEvent, getLocationByID, updateEvent, deleteEvent, newEnrollment, deleteEnrollment};

@@ -1,16 +1,20 @@
 import LocRepo from '../repos/location-repo.js';
 
 
-const getEventLocations = async () => {
+
+
+const getEventLocations = async (id) => {
     const repo = new LocRepo();
-    const returnArray = await repo.getEventLocations();
+    const returnArray = await repo.getEventLocations(id);
     return returnArray;
 };
 
-const getEventLocationByID = async (id) => {
+
+const getEventLocationByID = async (userID, id) => {
     const repo = new LocRepo();
-    const returnArray = await repo.getEventLocationByID(id);
+    const returnArray = await repo.getEventLocationByID(userID, id);
     return returnArray;
 };
+
 
 export {getEventLocations, getEventLocationByID}

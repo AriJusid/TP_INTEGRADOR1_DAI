@@ -13,6 +13,7 @@ import {
   fetchEventUsers,
   newEnrollment,
   deleteEnrollment,
+  verifyEnrollment,
 } from "../services/event-service.js";
 import pkg from "pg";
 import { authToken } from "../middleware/auth.js";
@@ -50,20 +51,31 @@ router.get("/search", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authToken, async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await getByID(id);
-
     if (isNaN(id)) {
       return res.status(StatusCodes.BAD_REQUEST).send("ID inválido");
     }
 
-    if (!result) {
+    const event = await getByID(id);
+
+    if (!event) {
       return res.status(StatusCodes.NOT_FOUND).send("Evento inexistente");
     }
 
-    res.status(StatusCodes.OK).json(result);
+    let is_user_enrolled = false;
+    if (req.user && req.user.id) {
+      is_user_enrolled = await verifyEnrollment(id, req.user.id);
+    }
+
+    console.log(is_user_enrolled)
+
+    return res.status(StatusCodes.OK).json({
+      ...event,
+      is_user_enrolled
+    });
+
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
