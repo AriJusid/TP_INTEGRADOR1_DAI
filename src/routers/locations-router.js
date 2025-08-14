@@ -1,7 +1,8 @@
 import config from "../config/config.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Router } from "express";
-import { getEventLocations, getEventLocationByID } from "../services/locations-service.js";
+import { getEventLocations, getEventLocationByID, createLocation } from "../services/locations-service.js";
+
 
 
 import pkg from "pg";
@@ -13,11 +14,6 @@ const router = Router();
 
 const { Pool } = pkg;
 const pool = new Pool(config);
-
-
-
-
-
 
 router.get("/", authToken, async (req, res) => {
     console.log("a")
@@ -67,4 +63,71 @@ router.get("/", authToken, async (req, res) => {
     }
   });
  
+  router.post("/", authToken, async (req, res) => {
+    const { id } = req.user;
+    const {
+      id_location,
+      name,
+      full_address,
+      max_capacity,
+      latitude,
+      longitude,
+      id_creator_user 
+    } = req.body;
+  
+  
+    try {
+      if (
+        !name ||
+        name.length < 3 ||
+        !full_address ||
+        full_address.length < 3 ||
+        !id_location ||
+        max_capacity === undefined ||
+        max_capacity <= 0
+      ) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: "false",
+          message: "Nombre y dirección deben tener al menos 3 letras. id_location debe existir. max_capacity debe ser mayor a 0.",
+        });
+      }
+      // console.log("id: ", id_location)
+      // const location = await getEventLocationByID(id, id_location);
+      // console.log("location:", location)
+
+      // if (!location) {
+      //   return res.status(StatusCodes.BAD_REQUEST).json({
+      //     success: "false",
+      //     message: "El id_location no existe.",
+      //   });
+      // }
+  
+      if (typeof id === "undefined") {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          success: "false",
+          message: "Debe iniciar sesión primero.",
+        });
+      }
+      console.log("body", req.body)
+      await createLocation({
+        id_location,
+        name,
+        full_address,
+        max_capacity,
+        latitude,
+        longitude,
+        id_creator_user
+      });
+  
+      return res.status(StatusCodes.CREATED).json({
+        success: "true",
+        message: "Event location creada!",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  });
+  
+
   export default router;

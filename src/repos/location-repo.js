@@ -65,4 +65,52 @@ WHERE el.id_creator_user = $1;`;
  
     return location;
   };
+  
+  createEventLocation = async (
+    id_location,
+    name,
+    full_address,
+    max_capacity,
+    latitude,
+    longitude,
+    id_creator_user
+  ) => {
+    console.log(latitude)
+  
+    let eventLocation = null;
+    const sql = `
+      INSERT INTO event_locations (
+        id_location,
+        name,
+        full_address,
+        max_capacity,
+        latitude,
+        longitude,
+        id_creator_user
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7
+      ) RETURNING *;
+    `;
+  
+    const values = [
+      id_location,
+      name,
+      full_address,
+      max_capacity,
+      latitude,
+      longitude,
+      id_creator_user
+    ];
+  
+    try {
+      console.log("SQL Query:", sql);
+      console.log("SQL values:", values);
+      const result = await pool.query(sql, values);
+      eventLocation = result.rows[0];
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+    return eventLocation;
+  };
 }
