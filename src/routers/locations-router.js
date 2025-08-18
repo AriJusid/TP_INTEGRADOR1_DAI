@@ -92,9 +92,7 @@ router.get("/", authToken, async (req, res) => {
           message: "Nombre y dirección deben tener al menos 3 letras. id_location debe existir. max_capacity debe ser mayor a 0.",
         });
       }
-      // console.log("id: ", id_location)
       // const location = await getEventLocationByID(id, id_location);
-      // console.log("location:", location)
 
       // if (!location) {
       //   return res.status(StatusCodes.BAD_REQUEST).json({
