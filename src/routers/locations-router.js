@@ -83,9 +83,10 @@ router.get("/", authToken, async (req, res) => {
         !full_address ||
         full_address.length < 3 ||
         !id_location ||
-        max_capacity === undefined ||
-        max_capacity <= 0
+        parseInt(max_capacity) === undefined ||
+        parseInt(max_capacity) <= 0
       ) {
+        console.log("max", max_capacity)
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: "false",
           message: "Nombre y dirección deben tener al menos 3 letras. id_location debe existir. max_capacity debe ser mayor a 0.",
@@ -108,8 +109,7 @@ router.get("/", authToken, async (req, res) => {
           message: "Debe iniciar sesión primero.",
         });
       }
-      console.log("body", req.body)
-      await createLocation({
+      await createLocation(
         id_location,
         name,
         full_address,
@@ -117,7 +117,7 @@ router.get("/", authToken, async (req, res) => {
         latitude,
         longitude,
         id_creator_user
-      });
+      );
   
       return res.status(StatusCodes.CREATED).json({
         success: "true",

@@ -390,8 +390,11 @@ deleteEnrollment = async (eventID, userID) => {
 verifyEnrollment = async (eventID, userID) => {
   const sql = `SELECT 1 FROM enrollment WHERE id_event = $1 AND id_user = $2 LIMIT 1`;
   const values = [eventID, userID];
+
   try {
     const result = await pool.query(sql, values);
+    console.log("resultado", result)
+
     return result.rowCount > 0;
   } catch (error) {
     console.log("Error:", error);

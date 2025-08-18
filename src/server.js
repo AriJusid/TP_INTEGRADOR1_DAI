@@ -7,7 +7,7 @@ import LocationsRouter from './routers/locations-router.js'
 const app  = express();
 const port = 4000;
 
-const allowedOrigins = ['http://localhost:5173', 'https://549a3519f5e6.ngrok-free.app'];
+const allowedOrigins = ['http://localhost:5173', 'https://900a77f0c7a6.ngrok-free.app']; //CAMBIAR LA URL CADA VEZ QUE CORRE NGROK
 
 app.use(cors({
   origin: function (origin, callback) {

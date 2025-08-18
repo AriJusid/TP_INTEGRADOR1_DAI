@@ -97,16 +97,19 @@ WHERE el.id_creator_user = $1;`;
       name,
       full_address,
       max_capacity,
-      latitude,
-      longitude,
+      parseInt(latitude),
+      parseInt(longitude),
       id_creator_user
     ];
   
+    console.log(values)
+
     try {
       console.log("SQL Query:", sql);
       console.log("SQL values:", values);
       const result = await pool.query(sql, values);
       eventLocation = result.rows[0];
+      console.log("eventLoc", eventLocation)
     } catch (e) {
       console.log(e);
       throw e;

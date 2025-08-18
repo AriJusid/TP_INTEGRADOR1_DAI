@@ -14,9 +14,22 @@ const getEventLocationByID = async (userID, id) => {
     return returnArray;
 };
 
-const createLocation = async (userID) => {
+const createLocation = async (id_location,
+    name,
+    full_address,
+    max_capacity,
+    latitude,
+    longitude,
+    id_creator_user) => {
     const repo = new LocRepo();
-    const returnArray = await repo.createEventLocation(userID);
+    const returnArray = await repo.createEventLocation(id_location,
+        name,
+        full_address,
+        max_capacity,
+        latitude,
+        longitude,
+        id_creator_user);
+    console.log("return", returnArray.rows)
     return returnArray;
 };
 
